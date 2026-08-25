@@ -3,7 +3,6 @@ import pandas as pd
 import seaborn as sns
 
 import constants
-import settings
 
 
 # PassengerId, Survived, Pclass, Name, Sex, Age, SibSp, Parch, Ticket, Fare, Cabin, Embarked
@@ -11,9 +10,6 @@ def print_train_data():
     if not constants.SHOULD_PRINT_DATA_ANALYTICS:
         print('Печать аналитики по данным не выполнена. Флаг SHOULD_PRINT_DATA_ANALYTICS False')
         return
-
-    # Установка настроек пандаса (показ всех колонок таблицы)
-    settings.set_pandas_settings()
 
     # вычитали файл в переменную, за индекс взяли колонку PassengerId
     train_data = pd.read_csv("./dataset/train.csv", index_col='PassengerId')
@@ -59,7 +55,7 @@ def print_train_data():
     print(train_data.describe())
 
     print("\nдля числовых типов можно найти корреляцию")
-    print(train_data[columns_int64 + columns_float64].corr())  # значимая корреляция выживания с полом, классом и стоимостью билета. кроме того класс коррелирует со стоимостью билета
+    print(train_data[columns_int64 + columns_float64].corr())  # значимая корреляция выживания с полом, классом и стоимостью билета. кроме того класс коррелирует со стоимостью билета, число родителей с полом и числом братьев, возраст с классом, братьями и родителями
     # та же корреляция в виде тепловой карты
     sns.heatmap(train_data[columns_int64 + columns_float64].corr(), annot=True, cmap="coolwarm", vmin=-1, vmax=1)
     plt.show()
@@ -68,7 +64,13 @@ def print_train_data():
     for column in columns_int64 + columns_float64:
         print(train_data.groupby(column)['Survived'].agg(['count', 'mean', 'median']))
         sns.catplot(x=column, y='Survived', data=train_data, kind="point")
-        # train_data.plot(x=column, y='Survived', kind='scatter')
+        plt.show()
+
+    # дополнительно нужны графики связи признаков с возрастом (чтобы понять, как лучше заменять пропуски возраста)
+    print("\nпостроим график зависимости возраста от других числовых признаков, чтобы понять принцип заполнения пропусков")
+    for column in columns_int64 + columns_float64:
+        print(train_data.groupby(column)['Age'].agg(['count', 'mean', 'median']))
+        sns.catplot(x=column, y='Age', data=train_data, kind="point")
         plt.show()
 
     # в чужом ноутбуке заметил, что можно смотреть зависимость с категориальными признаками. видно, что тут не случайное распределение
