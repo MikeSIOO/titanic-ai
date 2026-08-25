@@ -1,7 +1,9 @@
 import pandas as pd
+from sklearn.model_selection import KFold, cross_validate
 
 import data.analyze_data
 import data.get_data
+from models import base_model
 import settings
 from data import feature_engineering
 
@@ -15,12 +17,25 @@ if __name__ == '__main__':
     # Вывести различные метрики для анализа данных
     data.analyze_data.print_train_data()
 
+    # Загрузка данных из файла
+    train_data = pd.read_csv("./dataset/train.csv", index_col='PassengerId')
+    test_data = pd.read_csv("./dataset/test.csv", index_col='PassengerId')
+    # Разделение признаков и таргета
+    X_train = train_data.drop('Survived', axis=1)
+    y_train = train_data['Survived']
+    X_test = test_data
     # Создаем и обучаем трансформер для предобработки данных
     data_transformer = feature_engineering.DataTransformer()
-    train_data = pd.read_csv("./dataset/train.csv", index_col='PassengerId')
-    data_transformer.fit()
+    X_train = data_transformer.fit_transform(X_train)
+    # Предобработка данных
+    X_test = data_transformer.transform(X_test)
 
-    test_data = pd.read_csv("./dataset/test.csv", index_col='PassengerId')
-    transformed_test_data = data_transformer.transform(test_data)
-    print(transformed_test_data.head())
-    print(transformed_test_data.info())
+    # Базовая модель
+    base_model = base_model.BaseModel()
+    base_model_cv_results = cross_validate(
+        base_model, X_train, y_train,
+        cv=KFold(5),
+        scoring=['accuracy']
+    )
+
+    print(f'Accuracy для базовой модели CV: {base_model_cv_results['test_accuracy'].mean():.4f}, CV STD: {base_model_cv_results['test_accuracy'].std():.4f}')

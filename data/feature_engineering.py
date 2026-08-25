@@ -6,18 +6,21 @@ from sklearn.preprocessing import OneHotEncoder
 class DataTransformer:
 
     def __init__(self):
-        self.original_train_data = pd.read_csv("./dataset/train.csv", index_col='PassengerId')
-        self.train_data = self.original_train_data
         self.one_hot_encoder = None
         self.age_bins = None
         self.fare_by_pclass_bins = {}
 
-    def fit(self) -> None:
+    def fit_transform(self, train_data: pd.DataFrame) -> pd.DataFrame:
+        self.original_train_data = train_data
+        self.train_data = train_data
+
         self.__fill_na(self.train_data)
         self.__set_bins_for_cut()
         self.__sum_family_members(self.train_data)
         self.__set_one_hot_encoder()
         self.__drop_columns(self.train_data)
+
+        return self.train_data
 
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
