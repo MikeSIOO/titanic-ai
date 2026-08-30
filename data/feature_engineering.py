@@ -23,7 +23,6 @@ class DataTransformer:
 
         return self.train_data
 
-
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         df_to_transform = df.copy()
 
@@ -38,8 +37,8 @@ class DataTransformer:
         ).astype(int)
 
         scaled_df = pd.DataFrame(
-            self.scaler.fit_transform(df_to_transform[['Pclass', 'SibSp', 'Parch', 'Age_bin', 'Fare_bin', 'Fare_by_Pclass_bin','Family_size']]),
-            columns=['Pclass_norm', 'SibSp_norm', 'Parch_norm', 'Age_bin_norm', 'Fare_bin_norm','Fare_by_Pclass_bin_norm', 'Family_size_norm'],
+            self.scaler.fit_transform(df_to_transform[['Pclass', 'SibSp', 'Parch', 'Age_bin', 'Fare_bin', 'Fare_by_Pclass_bin', 'Family_size']]),
+            columns=['Pclass_norm', 'SibSp_norm', 'Parch_norm', 'Age_bin_norm', 'Fare_bin_norm', 'Fare_by_Pclass_bin_norm', 'Family_size_norm'],
             index=df_to_transform.index
         )
 
@@ -113,7 +112,7 @@ class DataTransformer:
             lambda x: x.fillna(x.mean())
         )
         # заполнение порта константой, так как мало пропусков
-        df.fillna({'Embarked' : 'S'}, inplace=True)
+        df.fillna({'Embarked': 'S'}, inplace=True)
 
         # в трейне не было этих пропусков, но заполним на всякий случай для теста
         df.fillna({'Sex': 'female'}, inplace=True)

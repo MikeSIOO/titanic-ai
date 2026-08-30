@@ -1,12 +1,10 @@
 import pandas as pd
-from sklearn.model_selection import KFold, cross_validate
 
-import constants
 import data.analyze_data
 import data.get_data
-from models import base_model, knn_model, logistic_regression
 import settings
 from data import feature_engineering
+from models import base_model, knn_model, logistic_regression
 
 if __name__ == '__main__':
     # Установка настроек пандаса (показ всех колонок таблицы)
