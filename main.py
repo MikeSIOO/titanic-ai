@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import KFold, cross_validate
 
+import constants
 import data.analyze_data
 import data.get_data
 from models import base_model
@@ -24,18 +25,13 @@ if __name__ == '__main__':
     X_train = train_data.drop('Survived', axis=1)
     y_train = train_data['Survived']
     X_test = test_data
+
     # Создаем и обучаем трансформер для предобработки данных
     data_transformer = feature_engineering.DataTransformer()
     X_train = data_transformer.fit_transform(X_train)
+
     # Предобработка данных
     X_test = data_transformer.transform(X_test)
 
     # Базовая модель
-    base_model = base_model.BaseModel()
-    base_model_cv_results = cross_validate(
-        base_model, X_train, y_train,
-        cv=KFold(5),
-        scoring=['accuracy']
-    )
-
-    print(f'Accuracy для базовой модели CV: {base_model_cv_results['test_accuracy'].mean():.4f}, CV STD: {base_model_cv_results['test_accuracy'].std():.4f}')
+    base_model.run_model(X_train, y_train)

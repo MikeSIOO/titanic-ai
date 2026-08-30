@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 
 class DataTransformer:
@@ -18,6 +18,7 @@ class DataTransformer:
         self.__set_bins_for_cut()
         self.__sum_family_members(self.train_data)
         self.__set_one_hot_encoder()
+        self.__set_norm_const()
         self.__drop_columns(self.train_data)
 
         return self.train_data
@@ -35,7 +36,14 @@ class DataTransformer:
             columns=self.one_hot_encoder.get_feature_names_out(['Embarked', 'Sex']),
             index=df_to_transform.index
         ).astype(int)
-        df_to_transform = pd.concat([df_to_transform, one_hot_df], axis=1)
+
+        scaled_df = pd.DataFrame(
+            self.scaler.fit_transform(df_to_transform[['Pclass', 'SibSp', 'Parch', 'Age_bin', 'Fare_bin', 'Fare_by_Pclass_bin','Family_size']]),
+            columns=['Pclass_norm', 'SibSp_norm', 'Parch_norm', 'Age_bin_norm', 'Fare_bin_norm','Fare_by_Pclass_bin_norm', 'Family_size_norm'],
+            index=df_to_transform.index
+        )
+
+        df_to_transform = pd.concat([df_to_transform, one_hot_df, scaled_df], axis=1)
 
         self.__drop_columns(df_to_transform)
 
@@ -78,6 +86,17 @@ class DataTransformer:
         self.one_hot_encoder = one_hot_encoder
         return
 
+    def __set_norm_const(self) -> None:
+        scaler = StandardScaler()
+        scaled_df = pd.DataFrame(
+            scaler.fit_transform(self.train_data[['Pclass', 'SibSp', 'Parch', 'Age_bin', 'Fare_bin', 'Fare_by_Pclass_bin', 'Family_size']]),
+            columns=['Pclass_norm', 'SibSp_norm', 'Parch_norm', 'Age_bin_norm', 'Fare_bin_norm', 'Fare_by_Pclass_bin_norm', 'Family_size_norm'],
+            index=self.train_data.index
+        )
+        self.train_data = pd.concat([self.train_data, scaled_df], axis=1)
+        self.scaler = scaler
+        return
+
     @staticmethod
     def __sum_family_members(df: pd.DataFrame) -> None:
         df['Family_size'] = df['SibSp'] + df['Parch']
@@ -110,13 +129,17 @@ class DataTransformer:
         # к сожалению, пока не придумал, что можно сделать с именем
         df.drop('Name', axis=1, inplace=True)
 
-        # Категориальные признаки (Sex, Embarked) заменены на one hot пердставление, но не все деревья умеют с ним работать, так что оставим
-        # непрерывные признаки (Age, Fare) тоже удалять не буду, предполажу, что деревья лучше с ними работают
-        # SibSp и Parch ценны как вместе (Family_size) так и пооттдельности хочется посмотреть на их влияние. Особенно учитывая, что у полей была хорошая корреляция с выживаемостью
+        # Для числовых признаков выполнена нормализация, исходные колонки можно дропнуть
+        df.drop(['SibSp', 'Parch', 'Family_size'], axis=1, inplace=True)
 
         # к сожалению, пока не придумал, что можно сделать с билетом
         df.drop('Ticket', axis=1, inplace=True)
 
         # слишком много пропусков в данных, точно удаляем
         df.drop('Cabin', axis=1, inplace=True)
+
+        # Категориальные признаки (Sex, Embarked) заменены на one hot пердставление, но не все деревья умеют с ним работать, так что оставим
+        # непрерывные признаки (Age, Fare) тоже удалять не буду, предполажу, что деревья лучше с ними работают
+        # SibSp и Parch ценны как вместе (Family_size) так и пооттдельности хочется посмотреть на их влияние. Особенно учитывая, что у полей была хорошая корреляция с выживаемостью
+        # Нормаированные признаки не заменят порядковые (Pclass, Age_bin, Fare_bin, Fare_by_Pclass_bin) потому что мне инетерснопроверить модели в двух вариантах
         return
