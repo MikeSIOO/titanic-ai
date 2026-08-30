@@ -11,7 +11,7 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
         base_model = BaseModel()
         base_model_cv_results = cross_validate(
             base_model, X_train, y_train,
-            cv=KFold(constants.BASE_MODEL['N_SPLITS']),
+            cv=KFold(constants.N_SPLITS),
             scoring=['accuracy']
         )
         print(f'Accuracy для базовой модели CV: {base_model_cv_results['test_accuracy'].mean():.4f}, CV STD: {base_model_cv_results['test_accuracy'].std():.4f}')

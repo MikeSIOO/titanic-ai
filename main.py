@@ -4,7 +4,7 @@ from sklearn.model_selection import KFold, cross_validate
 import constants
 import data.analyze_data
 import data.get_data
-from models import base_model
+from models import base_model, knn_model
 import settings
 from data import feature_engineering
 
@@ -35,3 +35,6 @@ if __name__ == '__main__':
 
     # Базовая модель
     base_model.run_model(X_train, y_train)
+
+    # Метод ближайших соседей
+    knn_model.run_model(X_train, y_train)
