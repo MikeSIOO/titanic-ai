@@ -35,3 +35,15 @@ DECISION_TREE_MODEL = {  # параметры, относящиеся к обу�
         'min_samples_split': 2,
     },
 }
+
+RANDOM_FOREST_MODEL = {  # параметры, относящиеся к обучению модели случайного леса
+    'ENABLED': True,  # нужно ли запускать обучение
+    'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
+    'BEST_PARAMS': {  # значения лучших параметров
+        'criterion': 'entropy',
+        'max_depth': None,
+        'min_samples_leaf': 2,
+        'min_samples_split': 2,
+        'n_estimators': 200
+    },
+}

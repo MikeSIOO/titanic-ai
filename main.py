@@ -4,7 +4,7 @@ import data.analyze_data
 import data.get_data
 import settings
 from data import feature_engineering
-from models import base_model, knn_model, logistic_regression_model, decision_tree_model
+from models import base_model, knn_model, logistic_regression_model, decision_tree_model, random_forest_model
 
 if __name__ == '__main__':
     # Установка настроек пандаса (показ всех колонок таблицы)
@@ -42,3 +42,6 @@ if __name__ == '__main__':
 
     # Решающее дерево
     decision_tree_model.run_model(X_train, y_train)
+
+    # Случайный лес
+    random_forest_model.run_model(X_train, y_train)
