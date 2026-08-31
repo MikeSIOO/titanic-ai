@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import cross_validate, KFold
+from sklearn.model_selection import cross_validate, StratifiedKFold
 
 import constants
 
@@ -18,7 +18,7 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
                 logistic_regression_model = LogisticRegression(C=lr)
                 logistic_regression_model_cv_results = cross_validate(
                     logistic_regression_model, X_train[columns_for_logistic_regression], y_train,
-                    cv=KFold(constants.N_SPLITS),
+                    cv=StratifiedKFold(n_splits=constants.CROSS_VALIDATION['N_SPLITS'], shuffle=True, random_state=constants.CROSS_VALIDATION['RANDOM_STATE']),
                     scoring=['accuracy']
                 )
                 print(f'Accuracy для модели линейной регрессии с числом соседей {lr} CV: {logistic_regression_model_cv_results['test_accuracy'].mean():.4f}, CV STD: {logistic_regression_model_cv_results['test_accuracy'].std():.4f}')
@@ -26,33 +26,11 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
                     best_accuracy = logistic_regression_model_cv_results['test_accuracy']
                     best_lr = lr
             print(f'Лучшее значение accuracy для модели линейной регрессии с числом соседей {best_lr} CV: {best_accuracy.mean():.4f}, CV STD: {best_accuracy.std():.4f}')
-
-            best_model = LogisticRegression(C=best_lr)
-            best_model.fit(X_train[columns_for_logistic_regression], y_train)
-
-            # Извлекаем коэффициенты
-            coefs = best_model.coef_[0]  # для бинарной классификации
-            feature_names = columns_for_logistic_regression
-
-            # Сортируем по абсолютной важности
-            sorted_idx = np.argsort(np.abs(coefs))[::-1]
-            coefs_sorted = coefs[sorted_idx]
-            features_sorted = [feature_names[i] for i in sorted_idx]
-
-            # Строим горизонтальный барплот
-            plt.figure(figsize=(10, 6))
-            colors = ['red' if c < 0 else 'green' for c in coefs_sorted]
-            plt.barh(features_sorted, coefs_sorted, color=colors)
-            plt.xlabel('Коэффициент (влияние на выживание)')
-            plt.title(f'Важность признаков в логистической регрессии (C={best_lr})')
-            plt.axvline(0, color='black', linestyle='-', linewidth=0.5)
-            plt.tight_layout()
-            plt.show()
         else:
             logistic_regression_model = LogisticRegression(C=constants.LOGISTIC_REGRESSION_MODEL['BEST_PARAMS']['lr'])
             logistic_regression_model_cv_results = cross_validate(
                 logistic_regression_model, X_train[columns_for_logistic_regression], y_train,
-                cv=KFold(constants.N_SPLITS),
+                cv=StratifiedKFold(n_splits=constants.CROSS_VALIDATION['N_SPLITS'], shuffle=True, random_state=constants.CROSS_VALIDATION['RANDOM_STATE']),
                 scoring=['accuracy']
             )
             print(f'Accuracy для модели линейной регрессии модели CV: {logistic_regression_model_cv_results['test_accuracy'].mean():.4f}, CV STD: {logistic_regression_model_cv_results['test_accuracy'].std():.4f}')

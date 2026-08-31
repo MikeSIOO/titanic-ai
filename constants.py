@@ -2,7 +2,10 @@ SHOULD_DOWNLOAD_DATA = False  # Нужно ли скачать датасет
 
 SHOULD_PRINT_DATA_ANALYTICS = False  # Нужно ли проводить анализ данных
 
-N_SPLITS = 5  # число фолдов для кросс валидации
+CROSS_VALIDATION = {
+    'N_SPLITS': 5,  # число фолдов для кросс валидации
+    'RANDOM_STATE': 42,  # сид рандомизатора
+}
 
 BASE_MODEL = {  # параметры, относящиеся к обучению базовой модели
     'ENABLED': False  # нужно ли запускать обучение
