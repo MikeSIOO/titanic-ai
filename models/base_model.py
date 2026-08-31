@@ -11,7 +11,7 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
         base_model = BaseModel()
         base_model_cv_results = cross_validate(
             base_model, X_train, y_train,
-            cv=StratifiedKFold(n_splits=constants.CROSS_VALIDATION['N_SPLITS'], shuffle=True, random_state=constants.CROSS_VALIDATION['RANDOM_STATE']),
+            cv=StratifiedKFold(n_splits=constants.N_SPLITS, shuffle=True, random_state=constants.RANDOM_STATE),
             scoring=['accuracy']
         )
         print(f'Accuracy для базовой модели CV: {base_model_cv_results['test_accuracy'].mean():.4f}, CV STD: {base_model_cv_results['test_accuracy'].std():.4f}')

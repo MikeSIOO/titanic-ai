@@ -4,7 +4,7 @@ import data.analyze_data
 import data.get_data
 import settings
 from data import feature_engineering
-from models import base_model, knn_model, logistic_regression
+from models import base_model, knn_model, logistic_regression_model, decision_tree_model
 
 if __name__ == '__main__':
     # Установка настроек пандаса (показ всех колонок таблицы)
@@ -38,4 +38,7 @@ if __name__ == '__main__':
     knn_model.run_model(X_train, y_train)
 
     # Метод логистической регрессии
-    logistic_regression.run_model(X_train, y_train)
+    logistic_regression_model.run_model(X_train, y_train)
+
+    # Решающее дерево
+    decision_tree_model.run_model(X_train, y_train)

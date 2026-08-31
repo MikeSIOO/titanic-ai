@@ -2,10 +2,8 @@ SHOULD_DOWNLOAD_DATA = False  # Нужно ли скачать датасет
 
 SHOULD_PRINT_DATA_ANALYTICS = False  # Нужно ли проводить анализ данных
 
-CROSS_VALIDATION = {
-    'N_SPLITS': 5,  # число фолдов для кросс валидации
-    'RANDOM_STATE': 42,  # сид рандомизатора
-}
+N_SPLITS = 5  # число фолдов для кросс валидации
+RANDOM_STATE = 42  # сид рандомизатора
 
 BASE_MODEL = {  # параметры, относящиеся к обучению базовой модели
     'ENABLED': False  # нужно ли запускать обучение
@@ -24,5 +22,16 @@ LOGISTIC_REGRESSION_MODEL = {  # параметры, относящиеся к �
     'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
     'BEST_PARAMS': {  # значения лучших параметров
         'lr': 0.1
+    },
+}
+
+DECISION_TREE_MODEL = {  # параметры, относящиеся к обучению модели решающего дерева
+    'ENABLED': False,  # нужно ли запускать обучение
+    'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
+    'BEST_PARAMS': {  # значения лучших параметров
+        'criterion': 'gini',
+        'max_depth': 3,
+        'min_samples_leaf': 5,
+        'min_samples_split': 2,
     },
 }

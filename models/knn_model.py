@@ -16,7 +16,7 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
                 knn_model = KNeighborsClassifier(n_neighbors=n_neighbors)
                 knn_model_cv_results = cross_validate(
                     knn_model, X_train[columns_for_knn], y_train,
-                    cv=StratifiedKFold(n_splits=constants.CROSS_VALIDATION['N_SPLITS'], shuffle=True, random_state=constants.CROSS_VALIDATION['RANDOM_STATE']),
+                    cv=StratifiedKFold(n_splits=constants.N_SPLITS, shuffle=True, random_state=constants.RANDOM_STATE),
                     scoring=['accuracy']
                 )
                 print(f'Accuracy для KNN модели с числом соседей {n_neighbors} CV: {knn_model_cv_results['test_accuracy'].mean():.4f}, CV STD: {knn_model_cv_results['test_accuracy'].std():.4f}')
@@ -28,7 +28,7 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
             knn_model = KNeighborsClassifier(n_neighbors=constants.KNN_MODEL['BEST_PARAMS']['n_neighbors'])
             knn_model_cv_results = cross_validate(
                 knn_model, X_train[columns_for_knn], y_train,
-                cv=StratifiedKFold(n_splits=constants.CROSS_VALIDATION['N_SPLITS'], shuffle=True, random_state=constants.CROSS_VALIDATION['RANDOM_STATE']),
+                cv=StratifiedKFold(n_splits=constants.N_SPLITS, shuffle=True, random_state=constants.RANDOM_STATE),
                 scoring=['accuracy']
             )
             print(f'Accuracy для KNN модели CV: {knn_model_cv_results['test_accuracy'].mean():.4f}, CV STD: {knn_model_cv_results['test_accuracy'].std():.4f}')

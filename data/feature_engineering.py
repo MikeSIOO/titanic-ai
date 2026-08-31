@@ -128,9 +128,6 @@ class DataTransformer:
         # к сожалению, пока не придумал, что можно сделать с именем
         df.drop('Name', axis=1, inplace=True)
 
-        # Для числовых признаков выполнена нормализация, исходные колонки можно дропнуть
-        df.drop(['SibSp', 'Parch', 'Family_size'], axis=1, inplace=True)
-
         # к сожалению, пока не придумал, что можно сделать с билетом
         df.drop('Ticket', axis=1, inplace=True)
 

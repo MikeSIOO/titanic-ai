@@ -18,7 +18,7 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
                 logistic_regression_model = LogisticRegression(C=lr)
                 logistic_regression_model_cv_results = cross_validate(
                     logistic_regression_model, X_train[columns_for_logistic_regression], y_train,
-                    cv=StratifiedKFold(n_splits=constants.CROSS_VALIDATION['N_SPLITS'], shuffle=True, random_state=constants.CROSS_VALIDATION['RANDOM_STATE']),
+                    cv=StratifiedKFold(n_splits=constants.N_SPLITS, shuffle=True, random_state=constants.RANDOM_STATE),
                     scoring=['accuracy']
                 )
                 print(f'Accuracy для модели линейной регрессии с числом соседей {lr} CV: {logistic_regression_model_cv_results['test_accuracy'].mean():.4f}, CV STD: {logistic_regression_model_cv_results['test_accuracy'].std():.4f}')
@@ -30,24 +30,19 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
             logistic_regression_model = LogisticRegression(C=constants.LOGISTIC_REGRESSION_MODEL['BEST_PARAMS']['lr'])
             logistic_regression_model_cv_results = cross_validate(
                 logistic_regression_model, X_train[columns_for_logistic_regression], y_train,
-                cv=StratifiedKFold(n_splits=constants.CROSS_VALIDATION['N_SPLITS'], shuffle=True, random_state=constants.CROSS_VALIDATION['RANDOM_STATE']),
+                cv=StratifiedKFold(n_splits=constants.N_SPLITS, shuffle=True, random_state=constants.RANDOM_STATE),
                 scoring=['accuracy']
             )
             print(f'Accuracy для модели линейной регрессии модели CV: {logistic_regression_model_cv_results['test_accuracy'].mean():.4f}, CV STD: {logistic_regression_model_cv_results['test_accuracy'].std():.4f}')
 
+            # Визуализация важности признаков
             best_model = LogisticRegression(C=constants.LOGISTIC_REGRESSION_MODEL['BEST_PARAMS']['lr'])
             best_model.fit(X_train[columns_for_logistic_regression], y_train)
-
-            # Извлекаем коэффициенты
-            coefs = best_model.coef_[0]  # для бинарной классификации
+            coefs = best_model.coef_[0]
             feature_names = columns_for_logistic_regression
-
-            # Сортируем по абсолютной важности
             sorted_idx = np.argsort(np.abs(coefs))[::-1]
             coefs_sorted = coefs[sorted_idx]
             features_sorted = [feature_names[i] for i in sorted_idx]
-
-            # Строим горизонтальный барплот
             plt.figure(figsize=(10, 6))
             colors = ['red' if c < 0 else 'green' for c in coefs_sorted]
             plt.barh(features_sorted, coefs_sorted, color=colors)
