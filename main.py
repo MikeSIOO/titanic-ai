@@ -4,7 +4,8 @@ import data.analyze_data
 import data.get_data
 import settings
 from data import feature_engineering
-from models import base_model, knn_model, logistic_regression_model, decision_tree_model, random_forest_model
+from models import base_model, knn_model, logistic_regression_model, decision_tree_model, random_forest_model, \
+    cat_boost_model
 
 if __name__ == '__main__':
     # Установка настроек пандаса (показ всех колонок таблицы)
@@ -45,3 +46,6 @@ if __name__ == '__main__':
 
     # Случайный лес
     random_forest_model.run_model(X_train, y_train)
+
+    # Градиентный бустинг (CatBoost)
+    cat_boost_model.run_model(X_train, y_train)

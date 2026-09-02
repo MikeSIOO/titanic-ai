@@ -42,22 +42,24 @@
 
 ### Solution
 
-| Approach                   | CV     | CV STD  | LB | Date  |
-|----------------------------|--------|---------|----|-------|
-| Базовая                    | 0.6161 | 0.0397  | -  | 25.08 |
-| KNN[1]                     | 0.7879 | 0.0297  | -  | 30.08 |
-| Логистическая регрессия[2] | 0.7946 | 0.0232  | -  | 30.08 |
-| Решающее дерево[3]         | 0.8227 | 0.0154  | -  | 31.08 |
-| Случайный лес[4]           | 0.8462 | 0.0155  | -  | 31.08 |
+| Approach                   | CV      | CV STD  | LB | Date  |
+|----------------------------|---------|---------|----|-------|
+| Базовая                    | 0.6161  | 0.0397  | -  | 25.08 |
+| KNN[1]                     | 0.7879  | 0.0297  | -  | 30.08 |
+| Логистическая регрессия[2] | 0.7946  | 0.0232  | -  | 30.08 |
+| Решающее дерево[3]         | 0.8227  | 0.0154  | -  | 31.08 |
+| Случайный лес[4]           | 0.8462  | 0.0155  | -  | 31.08 |
+| Бустинг CatBoost[5]        | 0.8226  | 0.0292  | -  | 02.09 |
 
 ### Annotations
 
-| № | Annotation                                                                                          |
-|---|-----------------------------------------------------------------------------------------------------|
-| 1 | n_neighbors = 21                                                                                    |
-| 2 | lr = 0.1                                                                                            |
-| 3 | criterion: gini, max_depth: 3, min_samples_leaf: 5, min_samples_split: 2                            |
-| 4 | criterion: 'entropy', max_depth: None, min_samples_leaf: 2, min_samples_split: 2, n_estimators: 200 |
+| № | Annotation                                                                                            |
+|---|-------------------------------------------------------------------------------------------------------|
+| 1 | n_neighbors = 21                                                                                      |
+| 2 | lr = 0.1                                                                                              |
+| 3 | criterion: gini, max_depth: 3, min_samples_leaf: 5, min_samples_split: 2                              |
+| 4 | criterion: 'entropy', max_depth: None, min_samples_leaf: 2, min_samples_split: 2, n_estimators: 200   |
+| 5 | grow_policy: 'Depthwise', subsample: 1, depth: 3, learning_rate: 0.1, l2_leaf_reg: 7, iterations: 100 |
 
 ### Final Ensemble
 

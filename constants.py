@@ -37,7 +37,7 @@ DECISION_TREE_MODEL = {  # параметры, относящиеся к обу�
 }
 
 RANDOM_FOREST_MODEL = {  # параметры, относящиеся к обучению модели случайного леса
-    'ENABLED': True,  # нужно ли запускать обучение
+    'ENABLED': False,  # нужно ли запускать обучение
     'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
     'BEST_PARAMS': {  # значения лучших параметров
         'criterion': 'entropy',
@@ -45,5 +45,18 @@ RANDOM_FOREST_MODEL = {  # параметры, относящиеся к обу�
         'min_samples_leaf': 2,
         'min_samples_split': 2,
         'n_estimators': 200
+    },
+}
+
+CAT_BOOST_MODEL = {  # параметры, относящиеся к обучению модели градиентного бустинга через библиотеку CatBoost
+    'ENABLED': False,  # нужно ли запускать обучение
+    'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
+    'BEST_PARAMS': {  # значения лучших параметров
+        'grow_policy': 'Depthwise',
+        'subsample': 1,
+        'depth': 3,
+        'learning_rate': 0.1,
+        'l2_leaf_reg': 7,
+        'iterations': 100
     },
 }
