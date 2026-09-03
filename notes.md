@@ -50,7 +50,8 @@
 | Решающее дерево[3]         | 0.8227 | 0.0154 | -  | 31.08 |
 | Случайный лес[4]           | 0.8462 | 0.0155 | -  | 31.08 |
 | Бустинг CatBoost[5]        | 0.8294 | 0.0439 | -  | 03.09 |
-| Бустинг CatBoost[6]        | 0.8462 | 0.0145 | -  | 03.09 |
+| Бустинг LightGBM[6]        | 0.8462 | 0.0145 | -  | 03.09 |
+| Бустинг XGBoost[7]         | 0.8395 | 0.0188 | -  | 03.09 |
 
 ### Annotations
 
@@ -62,6 +63,7 @@
 | 4 | criterion: 'entropy', max_depth: None, min_samples_leaf: 2, min_samples_split: 2, n_estimators: 200     |
 | 5 | grow_policy: 'Depthwise', subsample: 0.7, depth: 7, learning_rate: 0.05, l2_leaf_reg: 3, iterations: 10 |
 | 6 | learning_rate: 0.1, max_depth: -1, n_estimators: 50, num_leaves: 15, subsample: 0.7                     |
+| 7 | learning_rate: 0.1, max_depth': 3, n_estimators': 100, subsample': 0.8                                  |
 
 ### Final Ensemble
 

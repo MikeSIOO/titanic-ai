@@ -21,7 +21,9 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
                 estimator=DecisionTreeClassifier(random_state=constants.RANDOM_STATE),
                 param_grid=param_grid,
                 cv=StratifiedKFold(n_splits=constants.N_SPLITS, shuffle=True, random_state=constants.RANDOM_STATE),
-                scoring='accuracy')
+                scoring='accuracy',
+                n_jobs=-1
+            )
             grid.fit(X_train[columns_for_decision_tree], y_train)
             print(f'Лучшее значение accuracy для решающего дерева с параметрами {grid.best_params_} CV: {grid.best_score_:.4f}')
         else:

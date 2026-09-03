@@ -72,3 +72,14 @@ LIGHT_GBM_MODEL = {  # параметры, относящиеся к обуче�
         'subsample': 0.7,
     },
 }
+
+XG_BOOST_MODEL = {  # параметры, относящиеся к обучению модели градиентного бустинга через библиотеку XGBoost
+    'ENABLED': True,  # нужно ли запускать обучение
+    'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
+    'BEST_PARAMS': {  # значения лучших параметров
+        'learning_rate': 0.1,
+        'max_depth': 3,
+        'n_estimators': 100,
+        'subsample': 0.8,
+    },
+}
