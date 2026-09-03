@@ -60,3 +60,15 @@ CAT_BOOST_MODEL = {  # параметры, относящиеся к обуче�
         'iterations': 10
     },
 }
+
+LIGHT_GBM_MODEL = {  # параметры, относящиеся к обучению модели градиентного бустинга через библиотеку LightGBM
+    'ENABLED': False,  # нужно ли запускать обучение
+    'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
+    'BEST_PARAMS': {  # значения лучших параметров
+        'learning_rate': 0.1,
+        'max_depth': -1,
+        'n_estimators': 50,
+        'num_leaves': 15,
+        'subsample': 0.7,
+    },
+}

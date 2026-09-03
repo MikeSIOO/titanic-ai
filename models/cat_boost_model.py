@@ -34,8 +34,7 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
                 stratified=True,
                 partition_random_seed=constants.RANDOM_STATE,
             )
-            print(f'Лучшее значение accuracy для решающего дерева с параметрами {grid["params"]} CV: {max(grid["cv_results"]["test-Accuracy-mean"]):.4f}')
-
+            print(f'Лучшее значение accuracy для бустинга (CatBoost) с параметрами {grid["params"]} CV: {max(grid["cv_results"]["test-Accuracy-mean"]):.4f}')
 
             plt.plot(grid["cv_results"]['train-Accuracy-mean'], label='train accuracy')
             plt.plot(grid["cv_results"]['test-Accuracy-mean'], label='test accuracy')
@@ -67,11 +66,11 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
                 partition_random_seed=constants.RANDOM_STATE,
                 verbose=False
             )
-            print(f'Accuracy для решающего дерева CV: {cv_data['test-Accuracy-mean'].iloc[-1]:.4f}, CV STD: {cv_data['test-Accuracy-std'].iloc[-1]:.4f}')
+            print(f'Accuracy для бустинга (CatBoost) CV: {cv_data['test-Accuracy-mean'].iloc[-1]:.4f}, CV STD: {cv_data['test-Accuracy-std'].iloc[-1]:.4f}')
 
             plt.plot(cv_data['train-Accuracy-mean'], label='train accuracy')
             plt.plot(cv_data['test-Accuracy-mean'], label='test accuracy')
             plt.legend()
             plt.show()
     else:
-        print('Решающее дерево не обучено. Флаг CAT_BOOST_MODEL["ENABLED"]')
+        print('Бустинг (CatBoost) не обучено. Флаг CAT_BOOST_MODEL["ENABLED"]')

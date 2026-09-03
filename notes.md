@@ -42,14 +42,15 @@
 
 ### Solution
 
-| Approach                   | CV      | CV STD | LB | Date  |
-|----------------------------|---------|--------|----|-------|
-| Базовая                    | 0.6161  | 0.0397 | -  | 25.08 |
-| KNN[1]                     | 0.7879  | 0.0297 | -  | 30.08 |
-| Логистическая регрессия[2] | 0.7946  | 0.0232 | -  | 30.08 |
-| Решающее дерево[3]         | 0.8227  | 0.0154 | -  | 31.08 |
-| Случайный лес[4]           | 0.8462  | 0.0155 | -  | 31.08 |
-| Бустинг CatBoost[5]        | 0.8294  | 0.0439 | -  | 03.09 |
+| Approach                   | CV     | CV STD | LB | Date  |
+|----------------------------|--------|--------|----|-------|
+| Базовая                    | 0.6161 | 0.0397 | -  | 25.08 |
+| KNN[1]                     | 0.7879 | 0.0297 | -  | 30.08 |
+| Логистическая регрессия[2] | 0.7946 | 0.0232 | -  | 30.08 |
+| Решающее дерево[3]         | 0.8227 | 0.0154 | -  | 31.08 |
+| Случайный лес[4]           | 0.8462 | 0.0155 | -  | 31.08 |
+| Бустинг CatBoost[5]        | 0.8294 | 0.0439 | -  | 03.09 |
+| Бустинг CatBoost[6]        | 0.8462 | 0.0145 | -  | 03.09 |
 
 ### Annotations
 
@@ -60,6 +61,7 @@
 | 3 | criterion: gini, max_depth: 3, min_samples_leaf: 5, min_samples_split: 2                                |
 | 4 | criterion: 'entropy', max_depth: None, min_samples_leaf: 2, min_samples_split: 2, n_estimators: 200     |
 | 5 | grow_policy: 'Depthwise', subsample: 0.7, depth: 7, learning_rate: 0.05, l2_leaf_reg: 3, iterations: 10 |
+| 6 | learning_rate: 0.1, max_depth: -1, n_estimators: 50, num_leaves: 15, subsample: 0.7                     |
 
 ### Final Ensemble
 
