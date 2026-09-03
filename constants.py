@@ -53,10 +53,10 @@ CAT_BOOST_MODEL = {  # параметры, относящиеся к обуче�
     'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
     'BEST_PARAMS': {  # значения лучших параметров
         'grow_policy': 'Depthwise',
-        'subsample': 1,
-        'depth': 3,
-        'learning_rate': 0.1,
-        'l2_leaf_reg': 7,
-        'iterations': 100
+        'subsample': 0.7,
+        'depth': 7,
+        'learning_rate': 0.05,
+        'l2_leaf_reg': 3,
+        'iterations': 10
     },
 }

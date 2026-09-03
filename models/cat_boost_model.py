@@ -1,8 +1,6 @@
 import pandas as pd
 from catboost import CatBoostClassifier, cv, Pool
 from matplotlib import pyplot as plt
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, roc_curve, auc
-from sklearn.model_selection import StratifiedKFold, cross_validate
 
 import constants
 
@@ -12,14 +10,20 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
         columns = ['Pclass', 'Age', 'Fare', 'SibSp', 'Parch', 'Family_size', 'Sex', 'Embarked']
         cat_features = ['Sex', 'Embarked']
         if constants.CAT_BOOST_MODEL['FIND_BEST_PARAMS']:
-            model = CatBoostClassifier(cat_features=cat_features, random_seed=constants.RANDOM_STATE, eval_metric='Accuracy', verbose=False)
+            model = CatBoostClassifier(
+                cat_features=cat_features,
+                random_seed=constants.RANDOM_STATE,
+                eval_metric='Accuracy',
+                verbose=False,
+                early_stopping_rounds=10
+            )
             param_grid = {
-                'depth': [3, 5, 7],
-                'l2_leaf_reg': [1, 3, 5, 7],
-                'learning_rate': [0.01, 0.05, 0.1],
-                'iterations': [100, 200, 500, 1000],
-                'subsample': [0.8, 0.9, 1],
-                'grow_policy': ['SymmetricTree', 'Lossguide', 'Depthwise']
+                'depth': [3, 5, 7, 9],
+                'l2_leaf_reg': [1, 3, 5, 7, 10],
+                'learning_rate': [0.01, 0.03, 0.05, 0.1],
+                'iterations': [10, 20, 50, 100], # данных мало, поэтому при больших значения сильное переобучение
+                'subsample': [0.6, 0.7, 0.8, 0.9, 1.0],
+                'grow_policy': ['SymmetricTree', 'Depthwise']
             }
             grid = model.grid_search(
                 param_grid=param_grid,
@@ -31,6 +35,12 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
                 partition_random_seed=constants.RANDOM_STATE,
             )
             print(f'Лучшее значение accuracy для решающего дерева с параметрами {grid["params"]} CV: {max(grid["cv_results"]["test-Accuracy-mean"]):.4f}')
+
+
+            plt.plot(grid["cv_results"]['train-Accuracy-mean'], label='train accuracy')
+            plt.plot(grid["cv_results"]['test-Accuracy-mean'], label='test accuracy')
+            plt.legend()
+            plt.show()
         else:
             pool = Pool(
                 X_train[columns],
@@ -58,5 +68,10 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
                 verbose=False
             )
             print(f'Accuracy для решающего дерева CV: {cv_data['test-Accuracy-mean'].iloc[-1]:.4f}, CV STD: {cv_data['test-Accuracy-std'].iloc[-1]:.4f}')
+
+            plt.plot(cv_data['train-Accuracy-mean'], label='train accuracy')
+            plt.plot(cv_data['test-Accuracy-mean'], label='test accuracy')
+            plt.legend()
+            plt.show()
     else:
         print('Решающее дерево не обучено. Флаг CAT_BOOST_MODEL["ENABLED"]')
