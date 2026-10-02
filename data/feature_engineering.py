@@ -1,141 +1,171 @@
 import numpy as np
 import pandas as pd
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 
-class DataTransformer:
+class DataTransformer(BaseEstimator, TransformerMixin):
 
-    def __init__(self):
-        self.one_hot_encoder = None
-        self.age_bins = None
-        self.fare_by_pclass_bins = {}
+    def __init__(self, n_bins: int = 10,
+                 one_hot_columns=None,
+                 scale_columns=None,
+                 drop_columns=None):
+        self.n_bins = n_bins
+        self.one_hot_columns = one_hot_columns
+        self.scale_columns = scale_columns
+        self.drop_columns = drop_columns
 
-    def fit_transform(self, train_data: pd.DataFrame) -> pd.DataFrame:
-        self.original_train_data = train_data
-        self.train_data = train_data
+    def fit(self, X: pd.DataFrame, y=None) -> 'DataTransformer':
+        self.one_hot_columns_ = self.one_hot_columns or ['Embarked', 'Sex']
+        self.scale_columns_ = self.scale_columns or [
+            'Pclass', 'Age', 'SibSp', 'Parch', 'Fare',
+            'Age_bin', 'Fare_bin', 'Fare_by_Pclass_bin', 'Family_size',
+        ]
+        self.drop_columns_ = self.drop_columns or ['Name', 'Ticket', 'Cabin']
 
-        self.__fill_na(self.train_data)
-        self.__set_bins_for_cut()
-        self.__sum_family_members(self.train_data)
-        self.__set_one_hot_encoder()
-        self.__set_norm_const()
-        self.__drop_columns(self.train_data)
+        df = X.copy()
 
-        return self.train_data
+        # Средние для заполнения пропусков
+        self.age_means_by_group_ = df.groupby(['Pclass', 'SibSp', 'Parch'])['Age'].mean()
+        self.age_means_by_pclass_ = df.groupby('Pclass')['Age'].mean()
+        self.age_global_mean_ = df['Age'].mean()
 
-    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        df_to_transform = df.copy()
+        self.fare_means_by_pclass_ = df.groupby('Pclass')['Fare'].mean()
+        self.fare_global_mean_ = df['Fare'].mean()
 
-        self.__fill_na(df_to_transform)
-        self.__cut_by_bins(df_to_transform)
-        self.__sum_family_members(df_to_transform)
+        # Заполняем пропуски
+        df = self.__fill_na(df)
+
+        # Границы бинов
+        self.__fit_bins(df)
+
+        # Family_size
+        df = self.__sum_family_members(df)
+
+        # OneHotEncoder
+        self.one_hot_encoder_ = OneHotEncoder(
+            handle_unknown='ignore', drop='first', sparse_output=False
+        )
+        self.one_hot_encoder_.fit(df[self.one_hot_columns_])
+
+        # Бины (для скалера)
+        df = self.__apply_bins(df)
+
+        # StandardScaler
+        self.scaler_ = StandardScaler()
+        self.scaler_.fit(df[self.scale_columns_])
+
+        return self
+
+    def transform(self, X):
+        df = X.copy()
+        df = self.__fill_na(df)
+        df = self.__apply_bins(df)
+        df = self.__sum_family_members(df)
 
         one_hot_df = pd.DataFrame(
-            self.one_hot_encoder.transform(df_to_transform[['Embarked', 'Sex']]),
-            columns=self.one_hot_encoder.get_feature_names_out(['Embarked', 'Sex']),
-            index=df_to_transform.index
+            self.one_hot_encoder_.transform(df[self.one_hot_columns_]),
+            columns=self.one_hot_encoder_.get_feature_names_out(self.one_hot_columns_),
+            index=df.index,
         ).astype(int)
 
         scaled_df = pd.DataFrame(
-            self.scaler.fit_transform(df_to_transform[['Pclass', 'SibSp', 'Parch', 'Age_bin', 'Fare_bin', 'Fare_by_Pclass_bin', 'Family_size']]),
-            columns=['Pclass_norm', 'SibSp_norm', 'Parch_norm', 'Age_bin_norm', 'Fare_bin_norm', 'Fare_by_Pclass_bin_norm', 'Family_size_norm'],
-            index=df_to_transform.index
+            self.scaler_.transform(df[self.scale_columns_]),
+            columns=[c + '_norm' for c in self.scale_columns_],
+            index=df.index,
         )
 
-        df_to_transform = pd.concat([df_to_transform, one_hot_df, scaled_df], axis=1)
+        df = pd.concat([df, one_hot_df, scaled_df], axis=1)
+        df = self.__drop_columns(df)
+        return df
 
-        self.__drop_columns(df_to_transform)
+    def __fill_na(self, df: pd.DataFrame) -> pd.DataFrame:
+        df = df.copy()
 
-        return df_to_transform
+        def fill_age(row):
+            if pd.notna(row['Age']):
+                return row['Age']
+            key = (row['Pclass'], row['SibSp'], row['Parch'])
+            if key in self.age_means_by_group_.index:
+                mean_val = self.age_means_by_group_.loc[key]
+                if pd.notna(mean_val):
+                    return float(mean_val)
+            if row['Pclass'] in self.age_means_by_pclass_.index:
+                mean_val = self.age_means_by_pclass_.loc[row['Pclass']]
+                if pd.notna(mean_val):
+                    return float(mean_val)
+            return self.age_global_mean_
+        df['Age'] = df.apply(fill_age, axis=1)
 
-    def __set_bins_for_cut(self) -> None:
-        # Разбиваем возраст на бины в трейне и сохраняем границы, чтобы по ним же разбить на тесте
-        self.age_bins = np.linspace(self.train_data['Age'].min() - 1e-6, self.train_data['Age'].max() + 1e-6, 11)
-        self.train_data['Age_bin'] = pd.cut(self.train_data['Age'], bins=self.age_bins, labels=False, include_lowest=True).astype(int)
-        # Разбиваем стоимость билета на бины в трейне и сохраняем границы, чтобы по ним же разбить на тесте
-        self.fare_bins = np.linspace(self.train_data['Fare'].min() - 1e-6, self.train_data['Fare'].max() + 1e-6, 11)
-        self.train_data['Fare_bin'] = pd.cut(self.train_data['Fare'], bins=self.fare_bins, labels=False, include_lowest=True)
-        # Разбиваем стоимость билета для каждого класса отдельно на бины в трейне и сохраняем границы, чтобы по ним же разбить на тесте
-        for pclass in self.train_data['Pclass'].unique():
-            fares = self.train_data[self.train_data['Pclass'] == pclass]['Fare']
-            self.fare_by_pclass_bins[pclass] = np.linspace(fares.min() - 1e-6, fares.max() + 1e-6, 11)
-            self.train_data.loc[self.train_data['Pclass'] == pclass, 'Fare_by_Pclass_bin'] = pd.cut(fares, bins=self.fare_by_pclass_bins[pclass], labels=False, include_lowest=True).astype('Int64')
-        return
+        def fill_fare(row):
+            if pd.notna(row['Fare']):
+                return row['Fare']
+            if row['Pclass'] in self.fare_means_by_pclass_.index:
+                mean_val = self.fare_means_by_pclass_.loc[row['Pclass']]
+                if pd.notna(mean_val):
+                    return float(mean_val)
+            return self.fare_global_mean_
+        df['Fare'] = df.apply(fill_fare, axis=1)
 
-    def __cut_by_bins(self, df: pd.DataFrame) -> None:
-        # Разбиваем возраст в тесте на бины по сохраненным границам
-        df['Age_bin'] = pd.cut(df['Age'].clip(self.age_bins[0], self.age_bins[-1]), bins=self.age_bins, labels=False, include_lowest=True)
-        # Разбиваем стоимость билета в тесте на бины по сохраненным границам
-        df['Fare_bin'] = pd.cut(df['Fare'].clip(self.fare_bins[0], self.fare_bins[-1]), bins=self.fare_bins, labels=False, include_lowest=True)
-        # Разбиваем стоимость билета для каждого класса отдельно в тесте на бины по сохраненным границам
+        df['Embarked'] = df['Embarked'].fillna('S')
+        df['Sex'] = df['Sex'].fillna('female')
+        df['SibSp'] = df['SibSp'].fillna(0)
+        df['Parch'] = df['Parch'].fillna(0)
+
+        return df
+
+    def __fit_bins(self, df: pd.DataFrame) -> None:
+        # Age
+        self.age_bins_ = np.linspace(
+            df['Age'].min() - 1e-6, df['Age'].max() + 1e-6, self.n_bins + 1
+        )
+        # Fare
+        self.fare_bins_ = np.linspace(
+            df['Fare'].min() - 1e-6, df['Fare'].max() + 1e-6, self.n_bins + 1
+        )
+        # Fare по Pclass
+        self.fare_by_pclass_bins_ = {}
         for pclass in df['Pclass'].unique():
-            fares = df[df['Pclass'] == pclass]['Fare']
-            df.loc[df['Pclass'] == pclass, 'Fare_by_Pclass_bin'] = pd.cut(fares.clip(self.fare_by_pclass_bins[pclass][0], self.fare_by_pclass_bins[pclass][-1]), bins=self.fare_by_pclass_bins[pclass], labels=False, include_lowest=True).astype('Int64')
-        return
+            fares = df.loc[df['Pclass'] == pclass, 'Fare']
+            self.fare_by_pclass_bins_[pclass] = np.linspace(
+                fares.min() - 1e-6, fares.max() + 1e-6, self.n_bins + 1
+            )
 
-    def __set_one_hot_encoder(self) -> None:
-        one_hot_encoder = OneHotEncoder(handle_unknown='ignore', drop='first', sparse_output=False)
+    def __apply_bins(self, df: pd.DataFrame) -> pd.DataFrame:
+        df = df.copy()
 
-        one_hot_df = pd.DataFrame(
-            one_hot_encoder.fit_transform(self.train_data[['Embarked', 'Sex']]),
-            columns=one_hot_encoder.get_feature_names_out(['Embarked', 'Sex']),
-            index=self.train_data.index
+        # Age
+        df['Age_bin'] = pd.cut(
+            df['Age'].clip(self.age_bins_[0], self.age_bins_[-1]),
+            bins=self.age_bins_, labels=False, include_lowest=True,
         ).astype(int)
-        self.train_data = pd.concat([self.train_data, one_hot_df], axis=1)
-        self.one_hot_encoder = one_hot_encoder
-        return
 
-    def __set_norm_const(self) -> None:
-        scaler = StandardScaler()
-        scaled_df = pd.DataFrame(
-            scaler.fit_transform(self.train_data[['Pclass', 'SibSp', 'Parch', 'Age_bin', 'Fare_bin', 'Fare_by_Pclass_bin', 'Family_size']]),
-            columns=['Pclass_norm', 'SibSp_norm', 'Parch_norm', 'Age_bin_norm', 'Fare_bin_norm', 'Fare_by_Pclass_bin_norm', 'Family_size_norm'],
-            index=self.train_data.index
-        )
-        self.train_data = pd.concat([self.train_data, scaled_df], axis=1)
-        self.scaler = scaler
-        return
+        # Fare
+        df['Fare_bin'] = pd.cut(
+            df['Fare'].clip(self.fare_bins_[0], self.fare_bins_[-1]),
+            bins=self.fare_bins_, labels=False, include_lowest=True,
+        ).astype(int)
+
+        # Fare_by_Pclass_bin
+        df['Fare_by_Pclass_bin'] = 0
+        for pclass, bins in self.fare_by_pclass_bins_.items():
+            mask = df['Pclass'] == pclass
+            if mask.any():
+                fares_clipped = df.loc[mask, 'Fare'].clip(bins[0], bins[-1])
+                df.loc[mask, 'Fare_by_Pclass_bin'] = pd.cut(
+                    fares_clipped, bins=bins, labels=False, include_lowest=True,
+                ).astype(int)
+
+        return df
 
     @staticmethod
-    def __sum_family_members(df: pd.DataFrame) -> None:
+    def __sum_family_members(df: pd.DataFrame) -> pd.DataFrame:
+        df = df.copy()
         df['Family_size'] = df['SibSp'] + df['Parch']
-        return
+        return df
 
-    @staticmethod
-    def __fill_na(df: pd.DataFrame) -> None:
-        # заполнение пропусков на основе среднего, сгруппированного по 3 признакам, показавшим наилучшую корреляцию
-        df['Age'] = df.groupby(['Pclass', 'SibSp', 'Parch'])['Age'].transform(
-            lambda x: x.fillna(x.mean())
-        )
-        # заполнение оставшихся пропусков (на всякий случай) на основе толко класса билета
-        df['Age'] = df.groupby(['Pclass'])['Age'].transform(
-            lambda x: x.fillna(x.mean())
-        )
-        # заполнение порта константой, так как мало пропусков
-        df.fillna({'Embarked': 'S'}, inplace=True)
-
-        # в трейне не было этих пропусков, но заполним на всякий случай для теста
-        df.fillna({'Sex': 'female'}, inplace=True)
-        df.fillna({'SibSp': 0}, inplace=True)
-        df.fillna({'Parch': 0}, inplace=True)
-        df['Fare'] = df.groupby(['Pclass'])['Fare'].transform(
-            lambda x: x.fillna(x.mean())
-        )
-        return
-
-    @staticmethod
-    def __drop_columns(df: pd.DataFrame) -> None:
-        # к сожалению, пока не придумал, что можно сделать с именем
-        df.drop('Name', axis=1, inplace=True)
-
-        # к сожалению, пока не придумал, что можно сделать с билетом
-        df.drop('Ticket', axis=1, inplace=True)
-
-        # слишком много пропусков в данных, точно удаляем
-        df.drop('Cabin', axis=1, inplace=True)
-
-        # Категориальные признаки (Sex, Embarked) заменены на one hot пердставление, но не все деревья умеют с ним работать, так что оставим
-        # непрерывные признаки (Age, Fare) тоже удалять не буду, предполажу, что деревья лучше с ними работают
-        # SibSp и Parch ценны как вместе (Family_size) так и пооттдельности хочется посмотреть на их влияние. Особенно учитывая, что у полей была хорошая корреляция с выживаемостью
-        # Нормаированные признаки не заменят порядковые (Pclass, Age_bin, Fare_bin, Fare_by_Pclass_bin) потому что мне инетерснопроверить модели в двух вариантах
-        return
+    def __drop_columns(self, df: pd.DataFrame) -> pd.DataFrame:
+        df = df.copy()
+        cols_to_drop = [c for c in self.drop_columns_ if c in df.columns]
+        df.drop(cols_to_drop, axis=1, inplace=True)
+        return df

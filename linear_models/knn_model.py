@@ -1,22 +1,32 @@
 import pandas as pd
 from sklearn.model_selection import cross_validate, StratifiedKFold
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import Pipeline
 
 import constants
+from data.feature_engineering import DataTransformer
+from data.select_columns_for_model import ColumnSelector
 
 
 def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
     if constants.KNN_MODEL['ENABLED']:
         columns_for_knn = ['Pclass_norm', 'Sex_male', 'Age_bin_norm', 'Fare_bin_norm', 'Fare_by_Pclass_bin_norm', 'Embarked_Q', 'Embarked_S', 'SibSp_norm', 'Parch_norm', 'Family_size_norm']
+        cv = StratifiedKFold(n_splits=constants.N_SPLITS, shuffle=True, random_state=constants.RANDOM_STATE)
+
         if constants.KNN_MODEL['FIND_BEST_PARAMS']:
             possible_n_neighbors = [1, 3, 5, 7, 9, 11, 15, 21, 31]
             best_accuracy = None
             best_n_neighbors = None
             for n_neighbors in possible_n_neighbors:
                 knn_model = KNeighborsClassifier(n_neighbors=n_neighbors)
+                pipeline = Pipeline([
+                    ('transformer', DataTransformer()),
+                    ('selector', ColumnSelector(columns_for_knn)),
+                    ('model', knn_model),
+                ])
                 knn_model_cv_results = cross_validate(
-                    knn_model, X_train[columns_for_knn], y_train,
-                    cv=StratifiedKFold(n_splits=constants.N_SPLITS, shuffle=True, random_state=constants.RANDOM_STATE),
+                    pipeline, X_train, y_train,
+                    cv=cv,
                     scoring=['accuracy']
                 )
                 print(f'Accuracy для KNN модели с числом соседей {n_neighbors} CV: {knn_model_cv_results['test_accuracy'].mean():.4f}, CV STD: {knn_model_cv_results['test_accuracy'].std():.4f}')
@@ -26,9 +36,16 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
             print(f'Лучшее значение accuracy для KNN модели с числом соседей {best_n_neighbors} CV: {best_accuracy.mean():.4f}, CV STD: {best_accuracy.std():.4f}')
         else:
             knn_model = KNeighborsClassifier(n_neighbors=constants.KNN_MODEL['BEST_PARAMS']['n_neighbors'])
+
+            pipeline = Pipeline([
+                ('transformer', DataTransformer()),
+                ('selector', ColumnSelector(columns_for_knn)),
+                ('model', knn_model),
+            ])
+
             knn_model_cv_results = cross_validate(
-                knn_model, X_train[columns_for_knn], y_train,
-                cv=StratifiedKFold(n_splits=constants.N_SPLITS, shuffle=True, random_state=constants.RANDOM_STATE),
+                pipeline, X_train, y_train,
+                cv=cv,
                 scoring=['accuracy']
             )
             print(f'Accuracy для KNN модели CV: {knn_model_cv_results['test_accuracy'].mean():.4f}, CV STD: {knn_model_cv_results['test_accuracy'].std():.4f}')

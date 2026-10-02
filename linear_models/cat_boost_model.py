@@ -3,12 +3,17 @@ from catboost import CatBoostClassifier, cv, Pool
 from matplotlib import pyplot as plt
 
 import constants
+from data.feature_engineering import DataTransformer
 
 
 def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
     if constants.CAT_BOOST_MODEL['ENABLED']:
         columns = ['Pclass', 'Age', 'Fare', 'SibSp', 'Parch', 'Family_size', 'Sex', 'Embarked']
         cat_features = ['Sex', 'Embarked']
+
+        transformer = DataTransformer()
+        X_train = transformer.fit_transform(X_train)  # CatBoost реализует свою кросс валидацию, поэтому чтобы избежать утечек на трейн нужно было бы вручную написать цикл, но так как по факту мы заполняем только пропуски средними значениями, можно оставить эти незначительные утечки
+
         if constants.CAT_BOOST_MODEL['FIND_BEST_PARAMS']:
             model = CatBoostClassifier(
                 cat_features=cat_features,

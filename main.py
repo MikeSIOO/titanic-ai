@@ -6,6 +6,7 @@ import settings
 from data import feature_engineering
 from linear_models import base_model, knn_model, logistic_regression_model, decision_tree_model, random_forest_model, \
     cat_boost_model, light_gbm_model, xg_boost_model
+from nn_models import two_layer_simple_model
 
 if __name__ == '__main__':
     # Установка настроек пандаса (показ всех колонок таблицы)
@@ -19,18 +20,9 @@ if __name__ == '__main__':
 
     # Загрузка данных из файла
     train_data = pd.read_csv("./dataset/train.csv", index_col='PassengerId')
-    test_data = pd.read_csv("./dataset/test.csv", index_col='PassengerId')
     # Разделение признаков и таргета
     X_train = train_data.drop('Survived', axis=1)
     y_train = train_data['Survived']
-    X_test = test_data
-
-    # Создаем и обучаем трансформер для предобработки данных
-    data_transformer = feature_engineering.DataTransformer()
-    X_train = data_transformer.fit_transform(X_train)
-
-    # Предобработка данных
-    X_test = data_transformer.transform(X_test)
 
     # Базовая модель
     base_model.run_model(X_train, y_train)

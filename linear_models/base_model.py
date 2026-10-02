@@ -2,16 +2,23 @@ import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.model_selection import cross_validate, StratifiedKFold
+from sklearn.pipeline import Pipeline
 
 import constants
+from data.feature_engineering import DataTransformer
 
 
 def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
     if constants.BASE_MODEL['ENABLED']:
-        base_model = BaseModel()
+        pipeline = Pipeline([
+            ('transformer', DataTransformer()),
+            ('model', BaseModel()),
+        ])
+        cv = StratifiedKFold(n_splits=constants.N_SPLITS, shuffle=True, random_state=constants.RANDOM_STATE)
+
         base_model_cv_results = cross_validate(
-            base_model, X_train, y_train,
-            cv=StratifiedKFold(n_splits=constants.N_SPLITS, shuffle=True, random_state=constants.RANDOM_STATE),
+            pipeline, X_train, y_train,
+            cv=cv,
             scoring=['accuracy']
         )
         print(f'Accuracy для базовой модели CV: {base_model_cv_results['test_accuracy'].mean():.4f}, CV STD: {base_model_cv_results['test_accuracy'].std():.4f}')
@@ -24,11 +31,12 @@ class BaseModel(BaseEstimator, ClassifierMixin):
         self.best_prediction = best_prediction
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> 'BaseModel':
-        self.best_prediction = 1 if y.mean() > 0.5 else 0
+        self.best_prediction_ = int(y.mean() > 0.5)
+        self.classes_ = np.array([0, 1])
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        return np.full(X.shape[0], self.best_prediction, dtype=int)
+        return np.full(X.shape[0], self.best_prediction_, dtype=int)
 
     # Заглушки так как пришлось наследоваться от классов sklearn для удобной кросс валидации
     def get_params(self, deep=True):
