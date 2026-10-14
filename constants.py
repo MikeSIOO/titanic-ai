@@ -85,7 +85,7 @@ XG_BOOST_MODEL = {  # параметры, относящиеся к обучен
 }
 
 TWO_LAYER_SIMPLE_MODEL = {  # параметры, относящиеся к обучению нейросети с 2 слоями
-    'ENABLED': True,  # нужно ли запускать обучение
+    'ENABLED': False,  # нужно ли запускать обучение
     'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
     'NUM_EPOCHES': 20,
     'BEST_PARAMS': {  # значения лучших параметров
@@ -95,5 +95,16 @@ TWO_LAYER_SIMPLE_MODEL = {  # параметры, относящиеся к об
         'optimizer': 'adam',
         'weight_decay': 1e-2,
         'batch_size': 64
+    },
+}
+
+MULTIPLE_LAYERS_MODEL = {  # параметры, относящиеся к обучению нейросети
+    'ENABLED': False,  # нужно ли запускать обучение
+    'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
+    'NUM_EPOCHES': 25,
+    'BEST_PARAMS': {  # значения лучших параметров
+        'hidden_sizes': [64, 32],
+        'activations': ['tanh', 'tanh'],
+        'weight_decay': 1e-3
     },
 }

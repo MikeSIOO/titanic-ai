@@ -5,7 +5,7 @@ import data.get_data
 import settings
 from linear_models import base_model, knn_model, logistic_regression_model, decision_tree_model, random_forest_model, \
     cat_boost_model, light_gbm_model, xg_boost_model
-from nn_models import two_layer_simple_model
+from nn_models import two_layer_simple_model, multiple_layers_model
 
 if __name__ == '__main__':
     # Установка настроек пандаса (показ всех колонок таблицы)
@@ -49,3 +49,6 @@ if __name__ == '__main__':
 
     # Нейросеть с двумя слоями
     two_layer_simple_model.run_model(X_train, y_train)
+
+    # Нейросеть с несколькими слоями
+    multiple_layers_model.run_model(X_train, y_train)

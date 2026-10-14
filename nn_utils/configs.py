@@ -14,7 +14,7 @@ class MLPConfig:
 class TrainingConfig:
     lr: float = 1e-2 # lr при создании оптимизатора
     weight_decay: float = 0 # затухание весов в оптиимзаторе
-    optimizer: str = 'sgd' # модель оптимизатора (смотреть optimizer_factory для возможных значений)
+    optimizer: str = 'adam' # модель оптимизатора (смотреть optimizer_factory для возможных значений)
     scheduler: str = 'none' # модель шедулера (смотреть scheduler_factory для возможных значений)
     num_epochs: int = 20 # количество эпох для обучения
     batch_size: int = 64 # размер батча для создания дата лоудеров
