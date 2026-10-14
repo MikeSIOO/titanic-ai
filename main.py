@@ -3,7 +3,6 @@ import pandas as pd
 import data.analyze_data
 import data.get_data
 import settings
-from data import feature_engineering
 from linear_models import base_model, knn_model, logistic_regression_model, decision_tree_model, random_forest_model, \
     cat_boost_model, light_gbm_model, xg_boost_model
 from nn_models import two_layer_simple_model
@@ -47,3 +46,6 @@ if __name__ == '__main__':
 
     # Градиентный бустинг (XGBoost)
     xg_boost_model.run_model(X_train, y_train)
+
+    # Нейросеть с двумя слоями
+    two_layer_simple_model.run_model(X_train, y_train)

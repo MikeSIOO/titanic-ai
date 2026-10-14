@@ -83,3 +83,17 @@ XG_BOOST_MODEL = {  # параметры, относящиеся к обучен
         'subsample': 0.8,
     },
 }
+
+TWO_LAYER_SIMPLE_MODEL = {  # параметры, относящиеся к обучению нейросети с 2 слоями
+    'ENABLED': True,  # нужно ли запускать обучение
+    'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
+    'NUM_EPOCHES': 20,
+    'BEST_PARAMS': {  # значения лучших параметров
+        'hidden_sizes': [16],
+        'activations': ['leaky_relu'],
+        'lr': 1e-2,
+        'optimizer': 'adam',
+        'weight_decay': 1e-2,
+        'batch_size': 64
+    },
+}
