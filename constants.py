@@ -122,3 +122,14 @@ BATCHNORM_MODEL = {  # параметры, относящиеся к обуче�
         'weight_decay': 1e-3
     },
 }
+
+DROPOUT_MODEL = {  # параметры, относящиеся к обучению нейросети
+    'ENABLED': True,  # нужно ли запускать обучение
+    'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
+    'NUM_EPOCHES': 25,
+    'BEST_PARAMS': {  # значения лучших параметров
+        'hidden_sizes': [32, 16],
+        'activations': ['leaky_relu', 'sigmoid'],
+        'dropout': 0.1,
+    },
+}
