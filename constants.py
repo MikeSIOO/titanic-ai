@@ -1,3 +1,5 @@
+from sympy import true
+
 SHOULD_DOWNLOAD_DATA = False  # Нужно ли скачать датасет
 
 SHOULD_PRINT_DATA_ANALYTICS = False  # Нужно ли проводить анализ данных
@@ -105,6 +107,18 @@ MULTIPLE_LAYERS_MODEL = {  # параметры, относящиеся к об�
     'BEST_PARAMS': {  # значения лучших параметров
         'hidden_sizes': [64, 32],
         'activations': ['tanh', 'tanh'],
+        'weight_decay': 1e-3
+    },
+}
+
+BATCHNORM_MODEL = {  # параметры, относящиеся к обучению нейросети
+    'ENABLED': False,  # нужно ли запускать обучение
+    'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
+    'NUM_EPOCHES': 25,
+    'BEST_PARAMS': {  # значения лучших параметров
+        'hidden_sizes': [32, 16],
+        'activations': ['relu', 'leaky_relu'],
+        'batchnorm': True,
         'weight_decay': 1e-3
     },
 }
