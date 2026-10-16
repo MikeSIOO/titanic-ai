@@ -124,12 +124,21 @@ BATCHNORM_MODEL = {  # параметры, относящиеся к обуче�
 }
 
 DROPOUT_MODEL = {  # параметры, относящиеся к обучению нейросети
-    'ENABLED': True,  # нужно ли запускать обучение
+    'ENABLED': False,  # нужно ли запускать обучение
     'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
     'NUM_EPOCHES': 25,
     'BEST_PARAMS': {  # значения лучших параметров
         'hidden_sizes': [32, 16],
         'activations': ['leaky_relu', 'sigmoid'],
         'dropout': 0.1,
+    },
+}
+
+SCHEDULER_MODEL = {  # параметры, относящиеся к обучению нейросети
+    'ENABLED': False,  # нужно ли запускать обучение
+    'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
+    'NUM_EPOCHES': 50,
+    'BEST_PARAMS': {  # значения лучших параметров
+        'scheduler': 'cosine'
     },
 }

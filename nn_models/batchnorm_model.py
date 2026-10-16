@@ -15,7 +15,7 @@ COLUMNS_FOR_NN = [
 
 def run_model(X_train, y_train):
     if not constants.BATCHNORM_MODEL['ENABLED']:
-        print('Нейросеть с батчнолрмом. Флаг BATCHNORM_MODEL["ENABLED"]')
+        print('Нейросеть с батчнормом. Флаг BATCHNORM_MODEL["ENABLED"]')
         return
 
     if constants.BATCHNORM_MODEL['FIND_BEST_PARAMS']:

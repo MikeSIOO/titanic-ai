@@ -15,7 +15,7 @@ COLUMNS_FOR_NN = [
 
 def run_model(X_train, y_train):
     if not constants.DROPOUT_MODEL['ENABLED']:
-        print('Нейросеть с батчнолрмом. Флаг DROPOUT_MODEL["ENABLED"]')
+        print('Нейросеть с дропаут. Флаг DROPOUT_MODEL["ENABLED"]')
         return
 
     if constants.DROPOUT_MODEL['FIND_BEST_PARAMS']:
