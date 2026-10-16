@@ -1,5 +1,3 @@
-from sympy import true
-
 SHOULD_DOWNLOAD_DATA = False  # Нужно ли скачать датасет
 
 SHOULD_PRINT_DATA_ANALYTICS = False  # Нужно ли проводить анализ данных
@@ -141,4 +139,21 @@ SCHEDULER_MODEL = {  # параметры, относящиеся к обуче�
     'BEST_PARAMS': {  # значения лучших параметров
         'scheduler': 'cosine'
     },
+}
+
+FINAL_MODEL = {  # параметры, относящиеся к обучению нейросети
+    'ENABLED': False,  # нужно ли запускать обучение
+    'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
+    'BEST_PARAMS': {
+        'hidden_sizes': [32, 64, 32],
+        'batchnorm': False,
+        'dropout': 0.0,
+        'activation': 'leaky_relu',
+        'optimizer_name': 'adam',
+        'lr': 1e-2,
+        'weight_decay': 1e-3,
+        'scheduler_name': 'none',
+        'batch_size': 64,
+        'num_epochs': 50
+    }
 }

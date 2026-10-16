@@ -3,6 +3,7 @@ import pandas as pd
 import data.analyze_data
 import data.get_data
 import settings
+from final_nn import final_model
 from linear_models import base_model, knn_model, logistic_regression_model, decision_tree_model, random_forest_model, \
     cat_boost_model, light_gbm_model, xg_boost_model
 from nn_models import two_layer_simple_model, multiple_layers_model, batchnorm_model, dropout_model, scheduler_model
@@ -61,3 +62,6 @@ if __name__ == '__main__':
 
     # Нейросеть обучается с шедулером
     scheduler_model.run_model(X_train, y_train)
+
+    # Финальная версия нейросети
+    final_model.run_model(X_train, y_train)

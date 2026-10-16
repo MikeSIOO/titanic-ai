@@ -57,23 +57,25 @@
 | Нейросеть с batchnorm[10]           | 0.8170 | 0.0196 | -  | 14.10 |
 | Нейросеть с dropout[11]             | 0.8193 | 0.0213 | -  | 14.10 |
 | Нейросеть обученная с scheduler[12] | 0.8215 | 0.0164 | -  | 16.10 |
+| Нейросеть финальная[13]             | 0.8485 | 0.0139 | -  | 16.10 |
 
 ### Annotations
 
-| №  | Annotation                                                                                                                   |
-|----|------------------------------------------------------------------------------------------------------------------------------|
-| 1  | n_neighbors = 21                                                                                                             |
-| 2  | lr = 0.1                                                                                                                     |
-| 3  | criterion: gini, max_depth: 3, min_samples_leaf: 5, min_samples_split: 2                                                     |
-| 4  | criterion: 'entropy', max_depth: None, min_samples_leaf: 2, min_samples_split: 2, n_estimators: 200                          |
-| 5  | grow_policy: 'Depthwise', subsample: 0.7, depth: 7, learning_rate: 0.05, l2_leaf_reg: 3, iterations: 10                      |
-| 6  | learning_rate: 0.1, max_depth: -1, n_estimators: 50, num_leaves: 15, subsample: 0.7                                          |
-| 7  | learning_rate: 0.1, max_depth': 3, n_estimators': 100, subsample': 0.8                                                       |
-| 8  | 'hidden_sizes': [16], 'activations': ['leaky_relu'], 'lr': 1e-2, 'optimizer': 'adam', 'weight_decay': 1e-2, 'batch_size': 64 |
-| 9  | 'hidden_sizes': [64, 32], 'activations': ['tanh', 'tanh'], 'weight_decay': 1e-3                                              |
-| 10 | 'hidden_sizes': [32, 16], 'activations': ['relu', 'leaky_relu'], 'batchnorm': True, 'weight_decay': 1e-3                     |
-| 11 | 'hidden_sizes': [32, 16], 'activations': ['leaky_relu', 'sigmoid'], 'dropout': 0.1                                           |
-| 12 | 'scheduler': 'cosine'                                                                                                        |
+| №  | Annotation                                                                                                                                                                                                             |
+|----|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1  | n_neighbors = 21                                                                                                                                                                                                       |
+| 2  | lr = 0.1                                                                                                                                                                                                               |
+| 3  | criterion: gini, max_depth: 3, min_samples_leaf: 5, min_samples_split: 2                                                                                                                                               |
+| 4  | criterion: 'entropy', max_depth: None, min_samples_leaf: 2, min_samples_split: 2, n_estimators: 200                                                                                                                    |
+| 5  | grow_policy: 'Depthwise', subsample: 0.7, depth: 7, learning_rate: 0.05, l2_leaf_reg: 3, iterations: 10                                                                                                                |
+| 6  | learning_rate: 0.1, max_depth: -1, n_estimators: 50, num_leaves: 15, subsample: 0.7                                                                                                                                    |
+| 7  | learning_rate: 0.1, max_depth': 3, n_estimators': 100, subsample': 0.8                                                                                                                                                 |
+| 8  | 'hidden_sizes': [16], 'activations': ['leaky_relu'], 'lr': 1e-2, 'optimizer': 'adam', 'weight_decay': 1e-2, 'batch_size': 64                                                                                           |
+| 9  | 'hidden_sizes': [64, 32], 'activations': ['tanh', 'tanh'], 'weight_decay': 1e-3                                                                                                                                        |
+| 10 | 'hidden_sizes': [32, 16], 'activations': ['relu', 'leaky_relu'], 'batchnorm': True, 'weight_decay': 1e-3                                                                                                               |
+| 11 | 'hidden_sizes': [32, 16], 'activations': ['leaky_relu', 'sigmoid'], 'dropout': 0.1                                                                                                                                     |
+| 12 | 'scheduler': 'cosine'                                                                                                                                                                                                  |
+| 13 | 'hidden_sizes': [32, 64, 32], 'batchnorm': False, 'dropout': 0.0, 'activation': 'leaky_relu', 'optimizer_name': 'adam', 'lr': 1e-2, 'weight_decay': 1e-3, 'scheduler_name': 'none', 'batch_size': 64, 'num_epochs': 50 |
 
 ### Final Ensemble
 

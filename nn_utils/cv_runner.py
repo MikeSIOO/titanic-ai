@@ -11,10 +11,10 @@ from nn_utils.scheduler_factory import build_scheduler
 
 # создает дата лоадер для тестовой и валидационной выборки (по переданным колонкам) заданного размера батча
 def _make_loaders(X_tr, y_tr, X_val, y_val, batch_size, columns):
-    X_tr_np = X_tr[columns].astype(np.float32).values
-    X_val_np = X_val[columns].astype(np.float32).values
-    y_tr_np = y_tr.astype(np.float32).values.reshape(-1, 1)
-    y_val_np = y_val.astype(np.float32).values.reshape(-1, 1)
+    X_tr_np = X_tr[columns].to_numpy(dtype=np.float32, copy=True)
+    X_val_np = X_val[columns].to_numpy(dtype=np.float32, copy=True)
+    y_tr_np = y_tr.to_numpy(dtype=np.float32, copy=True).reshape(-1, 1)
+    y_val_np = y_val.to_numpy(dtype=np.float32, copy=True).reshape(-1, 1)
 
     train_ds = TensorDataset(torch.from_numpy(X_tr_np), torch.from_numpy(y_tr_np))
     val_ds = TensorDataset(torch.from_numpy(X_val_np), torch.from_numpy(y_val_np))
@@ -41,6 +41,8 @@ def cv_nn(
     histories = []
 
     for tr_idx, val_idx in skf.split(X_train, y_train):
+        torch.manual_seed(seed)
+        np.random.seed(seed)
         # трансформируем данные (обучение трансформера на тестовой части)
         transformer = DataTransformer()
         X_tr = transformer.fit_transform(X_train.iloc[tr_idx])
