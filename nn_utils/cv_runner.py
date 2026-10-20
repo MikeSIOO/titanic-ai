@@ -43,6 +43,7 @@ def cv_nn(
     for tr_idx, val_idx in skf.split(X_train, y_train):
         torch.manual_seed(seed)
         np.random.seed(seed)
+        torch.cuda.manual_seed_all(seed)
         # трансформируем данные (обучение трансформера на тестовой части)
         transformer = DataTransformer()
         X_tr = transformer.fit_transform(X_train.iloc[tr_idx])

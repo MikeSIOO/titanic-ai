@@ -9,17 +9,16 @@ def run_model(X_train, y_train):
         return
 
     if constants.FINAL_MODEL['FIND_BEST_PARAMS']:
-        find_best_hidden(X_train, y_train) # 8 -> 0.840638, 32 -> 0.840613, 64 -> 0.838353, 128 -> 0.838347, 16 -> 0.832754, 4 -> 0.824926
-        find_two_best_hidden(X_train, y_train) # [32, 64] -> 0.845094, [32, 8] -> 0.840613, [32, 32] -> 0.840600 (остальные хуже 8)
-        find_three_best_hidden(X_train, y_train) # [32, 64, 32] -> 0.845113 (остальные хуже [32, 64])
-        find_four_best_hidden(X_train, y_train) # результаты хуже, чем с 3 скрытыми слоями
-        find_best_batchnorm(X_train, y_train) # результаты хуже, чем в предыдущих экспериментах
-        find_best_dropout(X_train, y_train) # результаты хуже, чем в предыдущих экспериментах
-        find_best_activation(X_train, y_train) # leaky_relu -> 0.847342, relu -> 0.845113, tanh -> 0.840619
-        find_best_optimizer(X_train, y_train) # optimizer_name=adam, lr=0.010, weight_decay=0.001 -> 0.847342
-        find_best_scheduler(X_train, y_train) # результаты хуже, чем в предыдущих экспериментах
-        find_best_batch_size(X_train, y_train) # 64 -> 0.847342
-        find_best_num_epochs(X_train, y_train) # 70 -> 0.848465, 50 -> 0.848465, 100 -> 0.848465
+        # find_best_hidden(X_train, y_train) # 64 -> 0.825993
+        # find_two_best_hidden(X_train, y_train) # [64, 16] -> 0.826012 (остальные хуже)
+        # find_three_best_hidden(X_train, y_train) # [64, 16, 8] -> 0.823771 (хуже)
+        # find_best_batchnorm(X_train, y_train) # False -> 0.826012
+        # find_best_dropout(X_train, y_train) # 0.1 -> 0.829370
+        # find_best_activation(X_train, y_train) # relu -> 0.829370
+        # find_best_optimizer(X_train, y_train) # optimizer_name=adam, lr=0.010, weight_decay=0.001 -> 0.829370
+        # find_best_scheduler(X_train, y_train) # none -> 0.829370
+        # find_best_batch_size(X_train, y_train) # 64 -> 0.829370
+        find_best_num_epochs(X_train, y_train) # 30 -> 0.828259
     else: # Финальная CV: 0.8485 ± 0.0139
         final = cross_validate_nn(
             X_train, y_train,
@@ -53,23 +52,17 @@ def find_best_hidden(X_train, y_train):
             'weight_decay': [1e-3],
             'scheduler_name': ['none'],
             'batch_size': [64],
-            'num_epochs': [30],
+            'num_epochs': [20],
         },
     )
     print(results.to_string())
 
 def find_two_best_hidden(X_train, y_train):
-    # поиск лучшего размера 2 скрытых слоев (размер первого - два лучших варианта из предыдущего эксперимента)
+    # поиск лучшего размера 2 скрытых слоев
     results = search_grid(
         X_train, y_train,
         param_grid={
-            'hidden_sizes': [
-                [8, 8], [32, 8],
-                [8, 16], [32, 16],
-                [8, 32], [32, 32],
-                [8, 64], [32, 64],
-                [8, 128], [32, 128],
-            ],
+            'hidden_sizes': [[64, 8], [64, 16], [64, 32], [64, 64], [64, 128]],
             'batchnorm': [False],
             'dropout': [0.0],
             'activation': ['relu'],
@@ -78,7 +71,7 @@ def find_two_best_hidden(X_train, y_train):
             'weight_decay': [1e-3],
             'scheduler_name': ['none'],
             'batch_size': [64],
-            'num_epochs': [30],
+            'num_epochs': [20],
         },
     )
     print(results.to_string())
@@ -88,7 +81,7 @@ def find_three_best_hidden(X_train, y_train):
     results = search_grid(
         X_train, y_train,
         param_grid={
-            'hidden_sizes': [[32, 64, 8], [32, 64, 16], [32, 64, 32], [32, 64, 64], [32, 64, 128]],
+            'hidden_sizes': [[64, 16, 8], [64, 16, 16], [64, 16, 32], [64, 16, 64], [64, 16, 128]],
             'batchnorm': [False],
             'dropout': [0.0],
             'activation': ['relu'],
@@ -97,26 +90,7 @@ def find_three_best_hidden(X_train, y_train):
             'weight_decay': [1e-3],
             'scheduler_name': ['none'],
             'batch_size': [64],
-            'num_epochs': [30],
-        },
-    )
-    print(results.to_string())
-
-def find_four_best_hidden(X_train, y_train):
-    # поиск лучшего размера 4 скрытых слоев (размер первых трех - лучший вариант из предыдущего эксперимента)
-    results = search_grid(
-        X_train, y_train,
-        param_grid={
-            'hidden_sizes': [[32, 64, 32, 8], [32, 64, 32, 16], [32, 64, 32, 32], [32, 64, 32, 64], [32, 64, 32, 128]],
-            'batchnorm': [False],
-            'dropout': [0.0],
-            'activation': ['relu'],
-            'optimizer_name': ['adam'],
-            'lr': [1e-2],
-            'weight_decay': [1e-3],
-            'scheduler_name': ['none'],
-            'batch_size': [64],
-            'num_epochs': [30],
+            'num_epochs': [20],
         },
     )
     print(results.to_string())
@@ -126,7 +100,7 @@ def find_best_batchnorm(X_train, y_train):
     results = search_grid(
         X_train, y_train,
         param_grid={
-            'hidden_sizes': [[32, 64, 32]],
+            'hidden_sizes': [[64, 16]],
             'batchnorm': [False, True],
             'dropout': [0.0],
             'activation': ['relu'],
@@ -135,7 +109,7 @@ def find_best_batchnorm(X_train, y_train):
             'weight_decay': [1e-3],
             'scheduler_name': ['none'],
             'batch_size': [64],
-            'num_epochs': [30],
+            'num_epochs': [20],
         },
     )
     print(results.to_string())
@@ -145,7 +119,7 @@ def find_best_dropout(X_train, y_train):
     results = search_grid(
         X_train, y_train,
         param_grid={
-            'hidden_sizes': [[32, 64, 32]],
+            'hidden_sizes': [[64, 16]],
             'batchnorm': [False],
             'dropout': [0.0, 1e-3, 1e-2, 0.1, 0.2],
             'activation': ['relu'],
@@ -154,7 +128,7 @@ def find_best_dropout(X_train, y_train):
             'weight_decay': [1e-3],
             'scheduler_name': ['none'],
             'batch_size': [64],
-            'num_epochs': [30],
+            'num_epochs': [20],
         },
     )
     print(results.to_string())
@@ -164,16 +138,16 @@ def find_best_activation(X_train, y_train):
     results = search_grid(
         X_train, y_train,
         param_grid={
-            'hidden_sizes': [[32, 64, 32]],
+            'hidden_sizes': [[64, 16]],
             'batchnorm': [False],
-            'dropout': [0.0],
+            'dropout': [0.1],
             'activation': ['relu', 'tanh', 'leaky_relu'],
             'optimizer_name': ['adam'],
             'lr': [1e-2],
             'weight_decay': [1e-3],
             'scheduler_name': ['none'],
             'batch_size': [64],
-            'num_epochs': [30],
+            'num_epochs': [20],
         },
     )
     print(results.to_string())
@@ -183,16 +157,16 @@ def find_best_optimizer(X_train, y_train):
     results = search_grid(
         X_train, y_train,
         param_grid={
-            'hidden_sizes': [[32, 64, 32]],
+            'hidden_sizes': [[64, 16]],
             'batchnorm': [False],
-            'dropout': [0.0],
-            'activation': ['leaky_relu'],
+            'dropout': [0.1],
+            'activation': ['relu'],
             'optimizer_name': ['sgd', 'adam'],
             'lr': [1e-3, 1e-2, 1e-1],
             'weight_decay': [0, 1e-3, 1e-2, 1e-1],
             'scheduler_name': ['none'],
             'batch_size': [64],
-            'num_epochs': [30],
+            'num_epochs': [20],
         },
     )
     print(results.to_string())
@@ -202,16 +176,16 @@ def find_best_scheduler(X_train, y_train):
     results = search_grid(
         X_train, y_train,
         param_grid={
-            'hidden_sizes': [[32, 64, 32]],
+            'hidden_sizes': [[64, 16]],
             'batchnorm': [False],
-            'dropout': [0.0],
-            'activation': ['leaky_relu'],
+            'dropout': [0.1],
+            'activation': ['relu'],
             'optimizer_name': ['adam'],
             'lr': [1e-2],
             'weight_decay': [1e-3],
             'scheduler_name': ['none', 'step', 'cosine'],
             'batch_size': [64],
-            'num_epochs': [30],
+            'num_epochs': [20],
         },
     )
     print(results.to_string())
@@ -221,16 +195,16 @@ def find_best_batch_size(X_train, y_train):
     results = search_grid(
         X_train, y_train,
         param_grid={
-            'hidden_sizes': [[32, 64, 32]],
+            'hidden_sizes': [[64, 16]],
             'batchnorm': [False],
-            'dropout': [0.0],
-            'activation': ['leaky_relu'],
+            'dropout': [0.1],
+            'activation': ['relu'],
             'optimizer_name': ['adam'],
             'lr': [1e-2],
             'weight_decay': [1e-3],
             'scheduler_name': ['none'],
             'batch_size': [16, 32, 64, 128, 256],
-            'num_epochs': [30],
+            'num_epochs': [20],
         },
     )
     print(results.to_string())
@@ -240,16 +214,16 @@ def find_best_num_epochs(X_train, y_train):
     results = search_grid(
         X_train, y_train,
         param_grid={
-            'hidden_sizes': [[32, 64, 32]],
+            'hidden_sizes': [[64, 16]],
             'batchnorm': [False],
-            'dropout': [0.0],
-            'activation': ['leaky_relu'],
+            'dropout': [0.1],
+            'activation': ['relu'],
             'optimizer_name': ['adam'],
             'lr': [1e-2],
             'weight_decay': [1e-3],
             'scheduler_name': ['none'],
-            'batch_size': [64],
-            'num_epochs': [10, 20, 30, 50, 70, 100],
+            'batch_size': [32],
+            'num_epochs': [10, 20, 25, 30, 50, 70],
         },
     )
     print(results.to_string())

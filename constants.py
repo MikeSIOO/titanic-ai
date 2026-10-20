@@ -145,15 +145,19 @@ FINAL_MODEL = {  # параметры, относящиеся к обучени�
     'ENABLED': False,  # нужно ли запускать обучение
     'FIND_BEST_PARAMS': False,  # нужно ли искать лучшие параметры
     'BEST_PARAMS': {
-        'hidden_sizes': [32, 64, 32],
+        'hidden_sizes': [64, 16],
         'batchnorm': False,
-        'dropout': 0.0,
-        'activation': 'leaky_relu',
+        'dropout': 0.1,
+        'activation': 'relu',
         'optimizer_name': 'adam',
         'lr': 1e-2,
         'weight_decay': 1e-3,
         'scheduler_name': 'none',
         'batch_size': 64,
-        'num_epochs': 50
+        'num_epochs': 30
     }
+}
+
+MEAN_ENSEMBLE = {  # параметры, относящиеся к обучению ансамбля усреднения
+    'ENABLED': True  # нужно ли запускать обучение
 }
