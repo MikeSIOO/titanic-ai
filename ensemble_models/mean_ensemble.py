@@ -8,7 +8,6 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import StratifiedKFold
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
-from torch import nn
 from xgboost import XGBClassifier
 
 import constants
@@ -162,13 +161,14 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
         nn_accs.append(nn_acc)
         ensemble_accs.append(ensemble_acc)
 
-        print(f"knn={knn_acc:.4f} logistic_regression={logistic_regression_acc:.4f} decision_tree={decision_tree_acc:.4f} random_forest={random_forest_acc:.4f} cat_boost={cat_boost_acc:.4f} light_gbm={light_gbm_acc:.4f} xg_boost={xg_boost_acc:.4f} nn={nn_acc:.4f} ensemble={ensemble_acc:.4f}")
+        print(
+            f"knn={knn_acc:.4f} logistic_regression={logistic_regression_acc:.4f} decision_tree={decision_tree_acc:.4f} random_forest={random_forest_acc:.4f} cat_boost={cat_boost_acc:.4f} light_gbm={light_gbm_acc:.4f} xg_boost={xg_boost_acc:.4f} nn={nn_acc:.4f} ensemble={ensemble_acc:.4f}")
 
     print(f"knn: {np.mean(knn_accs):.4f} ± {np.std(knn_accs):.4f}")
     print(f"logistic_regression: {np.mean(logistic_regression_accs):.4f} ± {np.std(logistic_regression_accs):.4f}")
     print(f"decision_tree: {np.mean(decision_tree_accs):.4f} ± {np.std(decision_tree_accs):.4f}")
     print(f"random_forest: {np.mean(random_forest_accs):.4f} ± {np.std(random_forest_accs):.4f}")
-    print(f"cat_boost: {np.mean(cat_boost_accs):.4f} ± {np.std(cat_boost_accs):.4f}") # не совпадает с данными эксперимента из-за утечик трансформации данных и своей логики внутри библиотеки по разбиению на фолды
+    print(f"cat_boost: {np.mean(cat_boost_accs):.4f} ± {np.std(cat_boost_accs):.4f}")  # не совпадает с данными эксперимента из-за утечик трансформации данных и своей логики внутри библиотеки по разбиению на фолды
     print(f"light_gbm: {np.mean(light_gbm_accs):.4f} ± {np.std(light_gbm_accs):.4f}")
     print(f"xg_boost: {np.mean(xg_boost_accs):.4f} ± {np.std(xg_boost_accs):.4f}")
     print(f"nn: {np.mean(nn_accs):.4f} ± {np.std(nn_accs):.4f}")

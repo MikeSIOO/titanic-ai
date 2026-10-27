@@ -3,7 +3,7 @@ import pandas as pd
 import data.analyze_data
 import data.get_data
 import settings
-from ensemble_models import mean_ensemble
+from ensemble_models import mean_ensemble, voting_ensemble
 from final_nn import final_model
 from linear_models import base_model, knn_model, logistic_regression_model, decision_tree_model, random_forest_model, \
     cat_boost_model, light_gbm_model, xg_boost_model
@@ -69,3 +69,6 @@ if __name__ == '__main__':
 
     # Ансамбль усреднение
     mean_ensemble.run_model(X_train, y_train)
+
+    # Ансамбль голосование
+    voting_ensemble.run_model(X_train, y_train)
