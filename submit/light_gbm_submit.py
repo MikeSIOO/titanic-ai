@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 from lightgbm import LGBMClassifier
 
@@ -29,5 +31,8 @@ def submit_model(X_train: pd.DataFrame, y_train: pd.DataFrame, X_test: pd.DataFr
     predictions = model.predict(X_test_transformed[columns])
 
     output = pd.DataFrame({'PassengerId': X_test.index, 'Survived': predictions})
+    output_path = Path('./submission/light_gbm_submission.csv')
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output.to_csv(output_path, index=False)
     output.to_csv('./submission/light_gbm_submission.csv', index=False)
 

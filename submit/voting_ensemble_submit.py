@@ -134,4 +134,7 @@ def submit_model(X_train: pd.DataFrame, y_train: pd.DataFrame, X_test: pd.DataFr
     predictions = (weighted_vote > 0.5).astype(int)
 
     output = pd.DataFrame({'PassengerId': X_test.index, 'Survived': predictions})
+    output_path = Path('./submission/light_gbm_submission.csv')
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output.to_csv(output_path, index=False)
     output.to_csv('./submission/voting_ensemble_submission.csv', index=False)
