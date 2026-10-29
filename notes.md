@@ -82,9 +82,10 @@
 
 ### Final Ensemble
 
-| Model | CV  | Public LB | Private LB |
-| ----- | --- | --------- | ---------- |
-|       |     |           |            |
+| Model                   | CV      | Public LB | Private LB |
+|-------------------------|---------|-----------| ---------- |
+| LightGBM                | 0.76794 | ?         |            |
+| Ансамбль с голосованием | 0.78708 | 2086      |            |
 
 ### Processed ideas
 #### Good
