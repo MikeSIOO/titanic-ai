@@ -8,6 +8,7 @@ from final_nn import final_model
 from linear_models import base_model, knn_model, logistic_regression_model, decision_tree_model, random_forest_model, \
     cat_boost_model, light_gbm_model, xg_boost_model
 from nn_models import two_layer_simple_model, multiple_layers_model, batchnorm_model, dropout_model, scheduler_model
+from submit import light_gbm_submit, voting_ensemble_submit
 
 if __name__ == '__main__':
     # Установка настроек пандаса (показ всех колонок таблицы)
@@ -21,6 +22,7 @@ if __name__ == '__main__':
 
     # Загрузка данных из файла
     train_data = pd.read_csv("./dataset/train.csv", index_col='PassengerId')
+    X_test = pd.read_csv("./dataset/test.csv", index_col='PassengerId')
     # Разделение признаков и таргета
     X_train = train_data.drop('Survived', axis=1)
     y_train = train_data['Survived']
@@ -75,3 +77,9 @@ if __name__ == '__main__':
 
     # Ансамбль через линейную регрессию
     lin_reg_ensemble.run_model(X_train, y_train)
+
+    # Сабмит лучшей модели
+    light_gbm_submit.submit_model(X_train, y_train, X_test)
+
+    # Сабмит лучшего ансамбля
+    voting_ensemble_submit.submit_model(X_train, y_train, X_test)
