@@ -95,7 +95,6 @@ def train_one_fold(X_tr, y_tr, X_val, y_val,
     loss_history, train_history, val_history = [], [], []
 
     for epoch in range(num_epochs):
-        # --- train ---
         model.train()
         loss_accum = 0.0
         correct, total = 0, 0
@@ -115,7 +114,6 @@ def train_one_fold(X_tr, y_tr, X_val, y_val,
         loss_history.append(loss_accum / len(train_loader))
         train_history.append(correct / total)
 
-        # --- val ---
         model.eval()
         correct, total = 0, 0
         with torch.no_grad():
@@ -250,13 +248,11 @@ def nn_fit_and_predict(X_tr, y_tr, X_val,
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
 
-    # --- DataLoader только для train ---
     X_tr_np = X_tr[columns_for_nn].to_numpy(dtype=np.float32, copy=True)
     y_tr_np = y_tr.to_numpy(dtype=np.float32, copy=True).reshape(-1, 1)
     train_ds = TensorDataset(torch.from_numpy(X_tr_np), torch.from_numpy(y_tr_np))
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
 
-    # --- Модель, оптимизатор, scheduler ---
     model = build_mlp(
         in_features=len(COLUMNS_FOR_NN),
         hidden_sizes=hidden_sizes,
@@ -268,7 +264,6 @@ def nn_fit_and_predict(X_tr, y_tr, X_val,
     scheduler = build_scheduler(scheduler_name, optimizer, num_epochs)
     loss_fn = nn.BCEWithLogitsLoss()
 
-    # --- Обучение ---
     for epoch in range(num_epochs):
         model.train()
         for x, y in train_loader:
@@ -281,7 +276,6 @@ def nn_fit_and_predict(X_tr, y_tr, X_val,
         if scheduler is not None:
             scheduler.step()
 
-    # --- Предсказание ---
     model.eval()
     X_val_np = X_val[columns_for_nn].to_numpy(dtype=np.float32, copy=True)
     with torch.no_grad():

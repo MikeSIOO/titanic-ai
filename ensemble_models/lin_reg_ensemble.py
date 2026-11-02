@@ -76,7 +76,7 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
         meta_model = Ridge(alpha=1) # 0.1 -> 0.8339 ± 0.0192, 1 -> 0.8361 ± 0.0207, 10 -> 0.8350 ± 0.0185
         meta_model.fit(oof_matrix, y_tr)
 
-        # === ОБУЧЕНИЕ БАЗОВЫХ МОДЕЛЕЙ на полном X_tr и предсказание на X_val ===
+        # обучение базовых моделей
         base_preds_val = _fit_predict_all_models(
             X_tr, y_tr, X_val,
             columns_for_knn=columns_for_knn,
@@ -91,13 +91,12 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
             nn_seed=constants.RANDOM_STATE,
         )
 
-        # === ПРЕДСКАЗАНИЕ МЕТА-МОДЕЛИ ===
-        # Ridge возвращает score — это не вероятность, но порог 0.5 работает.
+        # предсказание мета модели
         ensemble_score = meta_model.predict(base_preds_val)
         ensemble_pred = (ensemble_score > 0.5).astype(int)
         ensemble_acc = accuracy_score(y_val, ensemble_pred)
 
-        # --- Индивидуальные accuracy (для отчёта) ---
+        # для отчета собираем метрики по моделям
         knn_pred = (base_preds_val[:, 0] > 0.5).astype(int)
         logistic_regression_pred = (base_preds_val[:, 1] > 0.5).astype(int)
         decision_tree_pred = (base_preds_val[:, 2] > 0.5).astype(int)
@@ -126,7 +125,7 @@ def run_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> None:
         nn_accs.append(nn_acc)
         ensemble_accs.append(ensemble_acc)
 
-        # Веса Ridge — это самое интересное в stacking
+        # результат + получившиеся веса
         print(f"knn={knn_acc:.4f} logreg={logistic_regression_acc:.4f} "
               f"tree={decision_tree_acc:.4f} rf={random_forest_acc:.4f} "
               f"cat={cat_boost_acc:.4f} lgbm={light_gbm_acc:.4f} "
